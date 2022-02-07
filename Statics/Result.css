@@ -1,0 +1,44 @@
+*{
+	padding: 0px;
+	margin: 0px;
+
+}
+body{
+
+	background-image: url(serverImage.png);
+	background-repeat: no-repeat;
+	background-position: right top;
+	background-size: 700px;
+
+}
+
+h2{
+
+	border: 2px darkblue solid;
+	border-radius: 10px;
+	box-shadow: 5px 5px;
+	padding: 10px;
+	margin: 2px;
+	color: black;
+	font-family: sans-serif
+}
+
+#result{
+
+	margin: 20px;
+	font-family: sans-serif;
+	font-size: 14px;
+
+}
+table, th, td{
+
+	border: 1px solid black;
+	border-collapse: collapse;
+	text-align: center;
+}
+table{
+
+	width: 50%;
+
+}
+

@@ -1,0 +1,70 @@
+*{
+
+	padding: 0px;
+	margin: 0px;
+	backgrond-color: white;
+
+}
+h2{
+
+	border: 2px darkblue solid;
+	border-radius: 10px;
+	box-shadow: 5px 5px;
+	padding: 10px;
+	margin: 2px;
+	color: black;
+	font-family: sans-serif
+}
+
+body{
+
+	background-image: url(ServerImage.png);
+	background-repeat: no-repeat;
+	background-position: right top;
+}
+
+#server_search{
+		
+	padding: 100px;
+	width: 400px;
+	height:200px;
+	color:black;
+	font-family: sans-serif;
+}
+
+#input{
+	border: 2px black solid;
+	border-radius: 5px;
+	box-shadow: 2px 2px;
+	height:30px;
+	width:300px;
+}
+
+::placeholder {
+
+	color: black;
+	padding: 4px;
+	text-align: left;
+	font-size: 12px;
+  
+}
+
+button{
+
+	border-radius: 5px;
+	border-shadow: 3px;
+	height:40px;
+	width:120px;
+	font-size: 13px;
+	font-weight: bold;
+}
+label{
+	margin:0px auto;
+	padding-bottom: 20px;
+	color: black;
+	font-size: 15px;
+	font-weight: bold;
+
+
+}
+

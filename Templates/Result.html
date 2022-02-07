@@ -1,0 +1,44 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Details</title>
+    <link rel = "stylesheet" type= 'text/CSS' href = "{% static 'Result.css'%}">
+</head>
+<body>
+
+    <h2><center>Server Health Details</center></h2>
+    <div id = "result">
+        <small>Server Name:</small> <strong>{{Hostname}}</strong><br><br>
+        <strong>Server Status: </strong>{{Server_Status}}<br><br>
+        <strong>CPU Utilization:</strong> {{CPU}}<br><br>
+        <strong>RAM Memory Utilization: </strong>{{RAM}}<br><br>
+        <strong>Uptime:</strong> {{Uptime}}<br><br>
+        <strong>Disk Space Details:</strong><br><br>
+        <div id="disk">
+            <table>
+		            <th>Logical Disk</th>
+                    <th>Total Space (GB)</thead>
+                    <th>Available Space (GB)</th>
+                    <th>Used Memory (GB)</th>
+                    <th>Used Percentage (%)</th>
+                {% for id,ts,fs,us,up in Disk %}
+                    <tr>
+                        <td>{{id}}</td>
+                        <td>{{ts}}</td>
+                        <td>{{fs}}</td>
+                        <td>{{us}}</td>
+                        <td>{{up}}</td>
+                    </tr>
+                {%endfor%}
+
+            </table>
+        </div>
+
+    </div>
+    
+</body>
+</html>
