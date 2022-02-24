@@ -25,6 +25,7 @@ def Result(request):
 
     Ping = os.system("ping -n 1 " + Hostname)
     if Ping == 0:
+        Server_status = "Accessible"
         Server = Server_Monitoring(Hostname,Username,Password)
         Disk = Server.DiskInfo()
         CPU_Util = Server.Utilization()
@@ -32,19 +33,20 @@ def Result(request):
 
         return render(request, 'Result.html',{
             'Hostname':Hostname,
-            'Server_Status':Ping,
+            'Server_Status':Server_status,
             'CPU':CPU_Util['CPU'],
             'RAM':CPU_Util['RAM'],
             'Uptime':Uptime,
             'Disk': Disk
         })
     else:
+        Server_status = "Not Accessible"
         CPU_Util = {'CPU':None,'RAM':None}
         Uptime = None
         Disk = None 
         return render(request, 'Result.html',{
             'Hostname':Hostname,
-            'Server_Status':Ping,
+            'Server_Status':Server_status,
             'CPU':CPU_Util['CPU'],
             'RAM':CPU_Util['RAM'],
             'Uptime':Uptime,
