@@ -1,55 +1,80 @@
-from multiprocessing import cpu_count
-from sqlite3 import connect
 from django.shortcuts import render
 from django.http import HttpResponse
 
-import wmi,ctypes
+import wmi
 import pythoncom
-import psutil
 import numpy as np
+from socket import *
+import datetime, os
 
 # Create your views here.
 def Home(request):
 
-    return render(request, "Index.html")
+    return render(request,'Home.html')
+
+def Index(request):
+
+    return render(request, 'Index.html')
 
 def Result(request):
 
-    Hostname = request.GET['server']
-    Server = Server_Monitoring()
-    Connect = Server.Connection()
-    Disk = Server.DiskInfo(Connect)
-    CR_Util = Server.Utilization(Connect)
-    Uptime = Server.Uptime_Status(Connect)
-    
-    Server_Status = ""
-    if(Connect==True):
-        Server_Status = "Server is online"
-    else:
-        Server_Status = "Server is Offline"
+    if request.method == "POST":
+        Hostname = request.POST['server']
+        Username = request.POST['username']    
+        Password = request.POST['password']
 
-    return render(request, 'Result.html',{
-        'Hostname':Hostname,
-        'Server_status':Server_Status,
-        'CPU':CR_Util['CPU'],
-        'RAM':CR_Util['RAM'],
-        'Uptime':Uptime,
-        'Disk': Disk
+    Ping = os.system("ping -n 1 " + Hostname)
+    if Ping == 0:
+        Server = Server_Monitoring(Hostname,Username,Password)
+        Disk = Server.DiskInfo()
+        CPU_Util = Server.Utilization()
+        Uptime = Server.Uptime_Status()
+
+        return render(request, 'Result.html',{
+            'Hostname':Hostname,
+            'Server_Status':Ping,
+            'CPU':CPU_Util['CPU'],
+            'RAM':CPU_Util['RAM'],
+            'Uptime':Uptime,
+            'Disk': Disk
+        })
+    else:
+        CPU_Util = {'CPU':None,'RAM':None}
+        Uptime = None
+        Disk = None 
+        return render(request, 'Result.html',{
+            'Hostname':Hostname,
+            'Server_Status':Ping,
+            'CPU':CPU_Util['CPU'],
+            'RAM':CPU_Util['RAM'],
+            'Uptime':Uptime,
+            'Disk': Disk
         })
 
 class Server_Monitoring:
 
-    def Connection(self):
+    def __init__(self,Host,User,Pass):
+        self.Host = Host
+        self.User = User
+        self.Pass = Pass
+
+    def Connection(self,Hostname, Username, Password):
+        self.Host = Hostname
+        self.User = Username
+        self.Pass = Password
+        global Server_status
         try:
             pythoncom.CoInitialize()
-            Connect = wmi.WMI()
+            Connect = wmi.WMI(self.Host, user = self.User, password = self.Pass)
+            Server_status = "Connected"
             return Connect
-        except:
-            return HttpResponse("Connection failed")
+
+        except wmi.x_wmi:
+            return HttpResponse("<h2>Your Username and Password of "+getfqdn(Hostname)+" are wrong.</h2>")
 
     # Disk Space Details
-    def DiskInfo(self, Connection):
-        self.Conn = Connection
+    def DiskInfo(self):
+        Connect = Server_Monitoring.Connection(self,self.Host, self.User, self.Pass)
         
         DiskName=[]
         TotalSpace = []
@@ -57,7 +82,7 @@ class Server_Monitoring:
         Spaces = []
         Percentages = []
 
-        for d in Connection.Win32_LogicalDisk():
+        for d in Connect.Win32_LogicalDisk(DriveType=3):
             DiskName.append(d.Caption)
             TotalSpace.append(round(float(d.Size) / 1024**3, 2))
             FreeSpace.append(round(float(d.FreeSpace)  / 1024**3, 2))
@@ -70,26 +95,33 @@ class Server_Monitoring:
         Disk_Zip = zip(DiskName,TotalSpace,FreeSpace,UsedSpace,UsedPercentage)
 
         return Disk_Zip
-
-            
-    def Utilization(self, Connection):
-        self.Conn = Connection
-        CPU_value = psutil.cpu_percent(4)
-        RAM_Value = psutil.virtual_memory()[2] 
-        CPU_RAM = {'CPU':CPU_value,'RAM':RAM_Value}
+          
+    def Utilization(self):
+        global Total_RAM
+        global Free_RAM
+        Connect = Server_Monitoring.Connection(self,self.Host, self.User, self.Pass)
+        Processer = Connect.Win32_Processor()
+        Cpu = Connect.Win32_ComputerSystem ()
+        Ram = Connect.Win32_PerfFormattedData_PerfOS_Memory()
+        for c in Processer:
+            CPU_value =c.LoadPercentage
+        for c in Cpu:
+            Total_ram = int(c.TotalPhysicalMemory)
+        for r in Ram:
+            Free_RAM = int(r.AvailableBytes)
+        Used_RAM = Total_ram - Free_RAM
+        Used_Percentage = round((Used_RAM / Total_ram) *100,2)
+        CPU_RAM = {'CPU':CPU_value,'RAM':Used_Percentage}
         return CPU_RAM
 
-    def Uptime_Status(self, Connection):
-
-        self.Conn = Connection
-
-        lib = ctypes.windll.kernel32
-        t = lib.GetTickCount64()
-        t = int(str(t)[:-3])
-
-        mins, sec = divmod(t, 60)
-        hour, mins = divmod(mins, 60)
-        days, hour = divmod(hour, 24)
-
-        Uptime = f"{days}:{hour:02}:{mins:02}:{sec:02}"
-        return Uptime
+    def Uptime_Status(self):
+        Connect = Server_Monitoring.Connection(self,self.Host, self.User, self.Pass)
+        Os = Connect.Win32_OperatingSystem()
+        LastBoot = str()
+        for o in Os:
+            LastBoot = o.LastBootUpTime
+        SplitBoot = LastBoot.split(".")[0]
+        BootTime = datetime.datetime.strptime(SplitBoot,"%Y%m%d%H%M%S")
+        date = datetime.datetime.now()
+        Uptime = date - BootTime
+        return str(Uptime).split(".")[0]

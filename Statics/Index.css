@@ -1,12 +1,9 @@
 *{
-
 	padding: 0px;
 	margin: 0px;
-	backgrond-color: white;
-
+	background-color: white;
 }
 h2{
-
 	border: 2px darkblue solid;
 	border-radius: 10px;
 	box-shadow: 5px 5px;
@@ -17,7 +14,6 @@ h2{
 }
 
 body{
-
 	background-image: url(ServerImage.png);
 	background-repeat: no-repeat;
 	background-position: right top;
@@ -50,9 +46,9 @@ body{
 }
 
 button{
-
+	border: 1px black solid;
 	border-radius: 5px;
-	border-shadow: 3px;
+	box-shadow: 3px;
 	height:40px;
 	width:120px;
 	font-size: 13px;

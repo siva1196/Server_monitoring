@@ -11,11 +11,16 @@
 </head>
 
 <body>
-    <form id = "form-1" action = "Result">
+    <form id = "form-1" method='post' action = "Result">
+        {%csrf_token%}
     <h2 id = "title"><center>Windows Servers Monitoring</center></h2>
     <div id="server_search">
     	<label for="input">Server Name: </label><br>
-	<input id = "input" type = 'text' name = 'server' placeholder="Enter Server Name"><br><br>
+	    <input id = "input" type = 'text' name = 'server' placeholder="Enter Server Name"><br><br>
+        <label for="input">User name: </label><br>
+	    <input id = "input" type = 'text' name = 'username' placeholder="User Name"><br><br>
+        <label for="input">Password: </label><br>
+	    <input id = "input" type = 'password' name = 'password' placeholder="Password"><br><br>
     	<button id = "button-1" type = 'submit'>Server Health</button>
     </div>
 </form>
